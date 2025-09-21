@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title> - WebModular | g200kg Music &amp; Software</title>
+<style>
+table {
+  border:1px solid #000;
+}
+td {
+  border:1px solid #000;
+}
+#header {
+  background:#ccf;
+}
+</style>
+</head>
+
+<body>
+<div id="container">
+<div id="header">
+  <div id="logo2"><a href="/"><img src="images/g200kg160x80.png"/></a></div>
+  <div style="clear:both"></div>
+</div>
+
+<br/>
+<div id="main">
+<h1>g200kg WebModular</h1>
+<button onclick="ShowDoc('ja')">Japanese</button> | <button onclick="ShowDoc('en')">English</button>
+
+<div class="doc_ja">
+<p>このプログラムは2017年頃に書いたものです。</p>
+<p>音を出すために Web Audio API で既に deprecated な Web Audio API の ScriptProcessorNode または既にサポートされていない Firefox の Audio Data API を使用しています。
+信号処理は波形データを直接 Javascript で生成し、出力のみを Web Audio API/Audio Data API を使用します。
+</p>
+<p>今後 Chrome から ScriptProcessorNode が削除されると動作しなくなりますが、過去の資料としてここに置いておきます。</p>
+<hr/>
+<p>HTML5+Javascriptで書いたモジュラーシンセサイザーです。Javascriptのソフトシンセでリアルタイムに音を合成しています。
+</p>
+</div>
+<div class="doc_en">
+<p>Modular Synthesizer written in HTML5+Javascript.
+Realtime sound genearation with javascript.
+</p>
+</div>
+<hr/>
+<br/>
+<select id="patch">
+<option value="clear">Clear All Patch</option>
+<option value="simple">1VCO+1VCA Most Simple Patch</option>
+<option value="basic" selected>2VCO=>1VCF=>1VCA Basic Patch</option>
+<option value="dual">2VCO=>2VCF=>2VCA Dual Channel Patch</option>
+<option value="lfo">LFO Modulation Patch</option>
+<option value="se">Sound Effect Patch</option>
+<option value="ring">Ring Patch</option>
+</select>
+<input type="button" value="Set" onclick="Setup()" />
+<br /><br />
+<div>
+<canvas id="canvas" width="700" height="700" tabindex="1"><input type=button /></canvas>
+</div>
+<form>
+MML:<br />
+<textarea style="width:500px" id="mml" rows=8 cols=80>t150
+e-d-<g-4>g-rg-4e-d-<g-4>g-rg-4e-d-<g-4>g-4<e-4>g-4<d-4>frf4
+e-d-<d-4>frf4e-d-<d-4>frf4e-d-<d-4>f4<e-4>f4<g-4>g-rg-4</textarea>
+<br />
+<button style="width:200px" type="button" onclick="CmdPlay(1)">
+<img src="images/play.png"/> Play
+</button>
+<button style="width:200px" type="button" onclick="CmdPlay(0)">
+<img src="images/stop.png"/> Stop
+</button>
+</form>
+<hr />
+<form>
+URL:<br /><textarea onclick="this.select()" id="url" rows=3 cols=80>
+</textarea>
+<br />
+<input type="button" style="width:260px;height:32px" value="SaveAs URL" onclick="CmdSave()" />
+<br />
+</form>
+<h3>Demo</h3>
+<a href="http://www.g200kg.com/jp/docs/webmodular/?p=1H2G5H8091BHCGEFHHIAK2L3N6WIY4eFfC_0022CPo300000COo00ZZ0YioI0Z00MkoK0ZI00o00Z000o0000oh00o00V1UPP00Q&m=t120l1o2aabbf+f+fe%0A">Sample Song 1</a>
+<br/>
+<a href="http://www.g200kg.com/jp/docs/webmodular/?p=0A1H2G3A5H80BHE1HHK2L3N6TCWIXIY4eFfC_OF00CPo000020COo00RbZVno00ZU0VIo00ZZ00o000000o000I00S000220QP0000&m=t145l16a%3Eceg%3Ec%3Cea%3Ecefec%3Ca%3Ec%3Cag">Sample Song 2</a>
+<img id="panel" src="./panel.png" height=0/><br />
+<img id="knob" src="./knob.png" height=0 /><br />
+<img id="knob2" src="./knob2.png" height=0 /><br />
+<img id="knob3" src="./knob3.png" height=0 /><br/>
+<img id="sw2" src="./sw2.png" height=0 /><br />
+<img id="sw3" src="./sw3.png" height=0 /><br />
+<img id="sw5" src="./sw5.png" height=0 /><br />
+<img id="slider" src="./sliderpos.png" height=0 /><br />
+<img id="keypress" src="./keypress.png" height=0 /><br />
+<hr/>
+
+<div class="doc_ja">
+<h3>使い方</h3>
+<h4>基本操作</h4>
+<p>2VCO / 2VCF / 2VCA / 2ENV / 2LFOの構成で各モジュールをパッチコードで接続して音色を作ります。
+</p>
+<p>パッチの接続は入力ジャックと出力ジャック間をマウスでドラッグします。
+それぞれのジャックの隣にある三角マークが外を向いているのが出力ジャック、ジャック側を向いている
+のが入力ジャックになります。入力ジャック同士、出力ジャック同士を接続する事はできません。
+</p>
+<p>
+1つの出力ジャックから複数の入力に接続する事が可能です。接続を削除する場合は入力ジャックからドラッグして何もない所で
+離してください。
+</p>
+<p>音を出すにはキーボードをマウスでクリックします。また、シンセの下側に「MML」の入力欄があります。
+ここにメロディをMMLで書いて「Play」を押すと自動演奏します。
+</p>
+<table>
+<tr><th colspan="2">MML文法</th></tr>
+<tr><th>文字</th><th>内容</th></tr>
+<tr><td>Tnn</td><td>テンポの設定</td></tr>
+<tr><td>A,B,C,D,E,F,G</td><td>音名。後ろに続く数字で音符の長さを指定</td></tr>
+<tr><td>+,#,-</td><td>シャープ/フラットを指定(+と#は同じ意味)</td></tr>
+<tr><td>R</td><td>休符。後ろに続く数字で音符の長さを指定</td></tr>
+<tr><td>Lnn</td><td>デフォルトの音符の長さ</td></tr>
+<tr><td>.</td><td>付点</td></tr>
+<tr><td>Onn</td><td>オクターブ指定</td></tr>
+<tr><td>&lt;,&gt;</td><td>以降をオクターブシフト</td></tr>
+<tr><td>&amp;</td><td>タイ</td></tr>
+</table>
+<br/>
+<h4>キーマッピング</h4>
+<p>キーボードで弾く事もできます。各キーは次のように割り当てられています。</p>
+<table style="border:1px solid #000">
+<tr><td style="color:#a0a0a0">1</td><td colspan=2 style="background:#808080"><b>2</b><br />C#3</td><td colspan=2 style="background:#808080"><b>3</b><br />D#3</td><td colspan=2 style="color:#a0a0a0">4</td><td colspan=2 style="background:#808080"><b>5</b><br />F#3</td><td colspan=2 style="background:#808080"><b>6</b><br />G#3</td><td colspan=2 style="background:#808080"><b>7</b><br />A#3</td><td colspan=2 style="color:#a0a0a0">8</td><td colspan=2 style="background:#808080"><b>9</b><br />C#4</td><td colspan=2 style="background:#808080"><b>0</b><br />D#4</td>
+</tr>
+<tr><td colspan=2><b>Q</b><br /> C3</td><td colspan=2><b>W</b><br /> D3</td><td colspan=2><b>E</b><br />E3</td><td colspan=2><b>R</b><br />F3</td><td colspan=2><b>T</b><br />G3</td><td colspan=2><b>Y</b><br />A3</td><td colspan=2><b>U</b><br />B3</td><td colspan=2><b>I</b><br />C4</td><td colspan=2><b>O</b><br />D4</td><td colspan=2><b>P</b><br />E4</td>
+</tr>
+<tr><td></td></td><td colspan=2 style="color:#a0a0a0">A</td><td colspan=2 style="background:#808080"><b>S</b><br />C#2</td><td colspan=2 style="background:#808080"><b>D</b><br />D#2</td><td colspan=2 style="color:#a0a0a0">F</td><td colspan=2 style="background:#808080"><b>G</b><br />F#2</td><td colspan=2 style="background:#808080"><b>H</b><br />G#2</td><td colspan=2 style="background:#808080"><b>J</b><br />A#2</td><td colspan=2 style="color:#a0a0a0">K</td><td colspan=2 style="background:#808080"><b>L</b><br />C#3</td><td colspan=2 style="background:#808080"><b>;</b><br />D#3</td>
+</tr>
+<tr><td colspan=2></td><td colspan=2><b>Z</b><br />C2</td><td colspan=2><b>X</b><br />D2</td><td colspan=2><b>C</b><br />E2</td><td colspan=2><b>V</b><br />F2</td><td colspan=2><b>B</b><br />G2</td><td colspan=2><b>N</b><br />A2</td><td colspan=2><b>M</b><br />B2</td><td colspan=2><b>,</b><br />C3</td><td colspan=2><b>.</b><br />D3</td><td colspan=2>/</td>
+</tr>
+</table>
+<br/>
+<h3>技術情報</h3>
+<p>WebModularはオーディオを扱うために'Web Audio API' (Chrome) または'Audio Data API' (Firefox)を
+使用しています。また、どちらも使えない場合はFlashオブジェクトを利用します。その判定部分は次の
+ようになっています。
+</p>
+<div class="notranslate">
+<pre><code class="language-js">
+    API = 0;
+    if (typeof (webkitAudioContext) != "undefined") {
+       API = 1; // WebAudioAPI
+       outbufsize = 1024;
+       ...
+    }
+    else if (typeof (Audio) == "function") {
+        audio = new Audio();
+        if (typeof (audio.mozSetup) == "function") {
+           API = 2; // AudioDataAPI
+           outbufsize = 1024;
+           ...
+        }
+    }
+    if (API == 0) {
+        // Use Flash Object
+        outbufsize = 4096;
+        ...
+    }
+</code></pre>
+</div>
+<p>Flashオブジェクトは単にPCMデータの出力にのみ使用し、Flash使用時でも全ての波形の生成処理は
+Javascript上で行っています。
+ただし残念ながらFlash使用時は出力バッファのサイズ、(=レイテンシー)は4倍になっています。
+これはFlashの制限とJavascript=>Actionscriptの受け渡しのオーバーヘッド、また
+Javascriptエンジンそのもののパフォーマンス(特にTypedArrayが使えない事)によるものです。
+</p>
+</div>
+
+<div class="doc_en">
+<h3>Usage</h3>
+<p>Consist modules of 2VCO / 2VCF / 2VCA / 2ENV / 2LFO.
+</p>
+
+<p>Drag mouse between input-jack and output-jack for connect modules.
+the triangle marks toward outside means output-jack, and toward the jack means a input-jack.
+input to input, or output to output connection is not allowed.one output-jack to multiple input-jack connection is possible.
+</p>
+<p>
+Drag from input-jack to anywhere except jacks for delete a connection.
+</p>
+<h4><a href="modules.html">Modules Description / Tutorial Page</a></h4>
+
+<p>The 'MML'(Music Macro Language) string in the MML field can be played. 
+</p>
+<table>
+<tr><td>Char</td><td>Description</td></tr>
+<tr><td>Tnn</td><td>Tempo setting</td></tr>
+<tr><td>A,B,C,D,E,F,G</td><td>Note name. following number is duration.</td></tr>
+<tr><td>+,#,-</td><td>sharp/flat</td></tr>
+<tr><td>R</td><td>rest</td></tr>
+<tr><td>Lnn</td><td>default note duration</td></tr>
+<tr><td>.</td><td>Dotted note</td></tr>
+<tr><td>Onn</td><td>Octave</td></tr>
+<tr><td>&lt;,&gt;</td><td>Octave shift</td></tr>
+<tr><td>&amp;</td><td>tie</td></tr>
+</table>
+<h4>Key Mapping</h4>
+<table>
+<tr><td style="color:#a0a0a0">1</td><td colspan=2 style="background:#808080"><b>2</b><br />C#3</td><td colspan=2 style="background:#808080"><b>3</b><br />D#3</td><td colspan=2 style="color:#a0a0a0">4</td><td colspan=2 style="background:#808080"><b>5</b><br />F#3</td><td colspan=2 style="background:#808080"><b>6</b><br />G#3</td><td colspan=2 style="background:#808080"><b>7</b><br />A#3</td><td colspan=2 style="color:#a0a0a0">8</td><td colspan=2 style="background:#808080"><b>9</b><br />C#4</td><td colspan=2 style="background:#808080"><b>0</b><br />D#4</td>
+</tr>
+<tr><td colspan=2><b>Q</b><br /> C3</td><td colspan=2><b>W</b><br /> D3</td><td colspan=2><b>E</b><br />E3</td><td colspan=2><b>R</b><br />F3</td><td colspan=2><b>T</b><br />G3</td><td colspan=2><b>Y</b><br />A3</td><td colspan=2><b>U</b><br />B3</td><td colspan=2><b>I</b><br />C4</td><td colspan=2><b>O</b><br />D4</td><td colspan=2><b>P</b><br />E4</td>
+</tr>
+<tr><td></td></td><td colspan=2 style="color:#a0a0a0">A</td><td colspan=2 style="background:#808080"><b>S</b><br />C#2</td><td colspan=2 style="background:#808080"><b>D</b><br />D#2</td><td colspan=2 style="color:#a0a0a0">F</td><td colspan=2 style="background:#808080"><b>G</b><br />F#2</td><td colspan=2 style="background:#808080"><b>H</b><br />G#2</td><td colspan=2 style="background:#808080"><b>J</b><br />A#2</td><td colspan=2 style="color:#a0a0a0">K</td><td colspan=2 style="background:#808080"><b>L</b><br />C#3</td><td colspan=2 style="background:#808080"><b>;</b><br />D#3</td>
+</tr>
+<tr><td colspan=2></td><td colspan=2><b>Z</b><br />C2</td><td colspan=2><b>X</b><br />D2</td><td colspan=2><b>C</b><br />E2</td><td colspan=2><b>V</b><br />F2</td><td colspan=2><b>B</b><br />G2</td><td colspan=2><b>N</b><br />A2</td><td colspan=2><b>M</b><br />B2</td><td colspan=2><b>,</b><br />C3</td><td colspan=2><b>.</b><br />D3</td><td colspan=2>/</td>
+</tr>
+</table>
+<br/>
+<h3>Technology</h3>
+<p>WebModular use 'Web Audio API' (Chrome) or 'Audio Data API' (Firefox) if available.
+The Flash object is used if neither API is available.
+</p>
+<pre><code class="language-js">
+    API = 0;
+    if (typeof (webkitAudioContext) != "undefined") {
+       API = 1; // WebAudioAPI
+       outbufsize = 1024;
+       ...
+    }
+    else if (typeof (Audio) == "function") {
+        audio = new Audio();
+        if (typeof (audio.mozSetup) == "function") {
+           API = 2; // AudioDataAPI
+           outbufsize = 1024;
+           ...
+        }
+    }
+    if (API == 0) {
+        // Use Flash Object
+        outbufsize = 4096;
+        ...
+    }
+</code></pre>
+<p>All PCM data generation (DSP) is done in javascript even if the Flash object mode.
+The Flash is just for PCM data output. Unfortunately, output buffer of the Flash mode
+is 4 times the size of others. Because of the Flash limitation, javascript=>actionscript overhead
+ and the javascript engine performance (especially the TypedArray availability).
+</p>
+</div>
+<script>
+function ShowDoc(x) {
+	var divs=document.getElementsByTagName("div");
+	var t="doc_"+x;
+	for(var i=0;i<divs.length;++i) {
+		if(divs[i].className=="doc_ja")
+			divs[i].style.display=(x==="ja")?"block":"none";
+		if(divs[i].className=="doc_en")
+			divs[i].style.display=(x==="ja")?"none":"block";
+	}
+}
+function GetLang() {
+	return (navigator.language || navigator.browserLanguage).substring(0, 2);
+}
+function InitDoc(){
+  ShowDoc(GetLang());
+}
+window.addEventListener("load",InitDoc);
+</script>
+<script src="webmodular.js"></script>
+<script>
+window.addEventListener("load",Init);
+</script>
+<div style="clear:both"></div>
+<div style="float:right">g200kg</div>
+
+<!-- google_ad_section_end -->
+<div style="clear:both"></div>
+<hr/>
+</div> <!-- contents -->
+</div> <!-- main -->
+<hr/>
+</div> <!-- container -->
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</body>
+</html>
