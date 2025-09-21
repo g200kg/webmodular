@@ -26,21 +26,25 @@ td {
 <br/>
 <div id="main">
 <h1>g200kg WebModular</h1>
+<p>Repository : <a href="https://github.com/g200kg/webmodular">https://github.com/g200kg/webmodular</a></p>
 <button onclick="ShowDoc('ja')">Japanese</button> | <button onclick="ShowDoc('en')">English</button>
 
 <div class="doc_ja">
 <p>このプログラムは2017年頃に書いたものです。</p>
 <p>音を出すために Web Audio API の ScriptProcessorNode または Firefox の Audio Data API または Flash による出力を使用しています。
-信号処理は波形データを直接 Javascript で生成し、出力のみを Web Audio API/Audio Data API を使用します。
+信号処理は波形データを直接 Javascript で生成し、出力のみにこれらの API を使用します。
 </p>
-<p>今後 Chrome から ScriptProcessorNode が削除されると動作しなくなりますが、過去の資料としてここに置いておきます。</p>
+<p>今後 Chrome から ScriptProcessorNode が削除されると動作しなくなりますが、信号処理的には意味があるかと思って、過去の資料としてここに置いておきます。</p>
 <hr/>
 <p>HTML5+Javascriptで書いたモジュラーシンセサイザーです。Javascriptのソフトシンセでリアルタイムに音を合成しています。
 </p>
 </div>
 <div class="doc_en">
-<p>Modular Synthesizer written in HTML5+Javascript.
-Realtime sound genearation with javascript.
+<p>This program was written around 2017.</p>
+<p>This program uses the Web Audio API's ScriptProcessorNode, Firefox's Audio Data API, or Flash to generate and output audio. Signal processing is handled directly in JavaScript by generating the waveform data, and only the output stage uses these APIs.
+<p>While it will likely cease to function once ScriptProcessorNode is removed from Chrome, I've kept it here as historical documentation, as I believe it demonstrates a useful approach to signal processing.</p>
+<hr/>
+<p>Modular Synthesizer written in HTML5+Javascript. Realtime sound genearation with javascript.
 </p>
 </div>
 <hr/>
